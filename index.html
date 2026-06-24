@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Cursos — TripleTen Brasil</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F9FB;color:#111827;min-height:100vh;padding:1.5rem}
+.container{max-width:920px;margin:0 auto}
+.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px}
+.brand-name{font-size:15px;font-weight:600;color:#374151}
+.brand-sub{font-size:12px;color:#9CA3AF;margin-top:2px}
+.brand-right{display:flex;align-items:center;gap:8px}
+.sync-status{font-size:11px;color:#9CA3AF;display:flex;align-items:center;gap:4px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#D1FAE5}
+.sync-dot.loading{background:#FEF3C7;animation:pulse 1s infinite}
+.sync-dot.error{background:#FEE2E2}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.btn{font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid #E5E7EB;background:#fff;color:#374151;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s}
+.btn:hover{background:#F3F4F6;border-color:#9CA3AF}
+.btn.primary{background:#111827;color:#fff;border-color:#111827}
+.btn.primary:hover{background:#374151}
+.main-nav{display:flex;gap:4px;margin-bottom:1.5rem;background:#F3F4F6;border-radius:10px;padding:4px;width:fit-content}
+.mnav{font-size:13px;padding:7px 14px;border-radius:7px;border:none;background:transparent;color:#6B7280;cursor:pointer;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .15s}
+.mnav:hover{color:#111827}
+.mnav.on{background:#fff;color:#111827;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.course-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
+.pill{font-size:12px;padding:6px 14px;border-radius:999px;border:1px solid #E5E7EB;background:#fff;color:#6B7280;cursor:pointer;font-family:inherit;transition:all .15s}
+.pill:hover{background:#F3F4F6}
+.pill.on{font-weight:600;border-width:2px}
+.course-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid #F3F4F6}
+.course-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.course-name{font-size:20px;font-weight:600;color:#111827}
+.course-meta{font-size:13px;color:#6B7280;margin-top:3px}
+.quick-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:8px;margin-bottom:1.25rem}
+.ql{background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:10px 12px;text-decoration:none;display:flex;align-items:center;gap:10px;transition:border-color .15s}
+.ql:hover{border-color:#9CA3AF}
+.ql-label{font-size:11px;color:#9CA3AF;display:block}
+.ql-val{font-size:12px;font-weight:600}
+.sections{display:flex;flex-direction:column;gap:8px}
+.sec-block{background:#fff;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none}
+.sec-head:hover{background:#FAFAFA}
+.sec-head-left{display:flex;align-items:center;gap:8px}
+.sec-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.chevron{font-size:14px;color:#9CA3AF;transition:transform .2s}
+.sec-body{padding:12px 16px;font-size:13px;color:#4B5563;line-height:1.65;border-top:1px solid #F3F4F6;white-space:pre-wrap;display:none}
+.sec-body.open{display:block}
+.proj-row{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid #F3F4F6}
+.proj-row:last-child{border-bottom:none}
+.proj-name{padding:10px 12px;font-size:12px;font-weight:600;border-right:1px solid #F3F4F6}
+.proj-desc{padding:10px 12px;font-size:12px;color:#4B5563;line-height:1.5}
+.pay-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 12px;color:#9CA3AF;font-weight:600;border-bottom:1px solid #F3F4F6;font-size:11px;white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid #F9FAFB;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAFA}
+.dpill{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:600;white-space:nowrap}
+.plink{text-decoration:none;font-size:11px;font-weight:600}
+.plink:hover{text-decoration:underline}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.sec-hdr-title{font-size:16px;font-weight:600;color:#111827}
+.cup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:1.5rem}
+.cup-card{background:#fff;border:0.5px solid #E5E7EB;border-radius:12px;padding:14px 16px}
+.cup-code{font-family:monospace;font-size:17px;font-weight:700;color:#111827;margin-bottom:3px}
+.cup-disc{font-size:13px;font-weight:600;margin-bottom:2px}
+.cup-obs{font-size:11px;color:#9CA3AF}
+.ind-table{width:100%;border-collapse:collapse;font-size:13px}
+.ind-table th{text-align:left;padding:8px 12px;color:#9CA3AF;font-weight:600;border-bottom:1px solid #F3F4F6;font-size:11px}
+.ind-table td{padding:10px 12px;border-bottom:1px solid #F9FAFB;vertical-align:middle}
+.ind-table tr:last-child td{border-bottom:none}
+.ind-table tr:hover td{background:#FAFAFA}
+.ind-link{color:#1D4ED8;text-decoration:none;font-size:12px;font-family:monospace}
+.ind-link:hover{text-decoration:underline}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:1.5rem;width:100%;max-width:740px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid #F3F4F6}
+.modal-title{font-size:16px;font-weight:600;color:#111827}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid #E5E7EB;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#6B7280}
+.modal-close:hover{background:#F3F4F6}
+.modal-tabs{display:flex;gap:4px;margin-bottom:1.25rem;background:#F3F4F6;border-radius:10px;padding:4px}
+.modal-tab{flex:1;font-size:12px;padding:6px 10px;border-radius:7px;border:none;background:transparent;color:#6B7280;cursor:pointer;font-family:inherit;font-weight:500;transition:all .15s;text-align:center}
+.modal-tab.on{background:#fff;color:#111827;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tab-panel{display:none}
+.tab-panel.on{display:block}
+.modal-section{margin-bottom:1.25rem}
+.modal-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:10px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field-row.full{grid-template-columns:1fr}
+.field-group{display:flex;flex-direction:column;gap:4px}
+.field-label{font-size:11px;color:#6B7280;font-weight:500}
+.field-input{font-size:13px;padding:7px 10px;border:1px solid #E5E7EB;border-radius:8px;font-family:inherit;color:#111827;outline:none;transition:border-color .15s;width:100%}
+.field-input:focus{border-color:#9CA3AF}
+.field-textarea{font-size:13px;padding:7px 10px;border:1px solid #E5E7EB;border-radius:8px;font-family:inherit;color:#111827;outline:none;transition:border-color .15s;width:100%;resize:vertical;min-height:90px;line-height:1.5}
+.field-textarea:focus{border-color:#9CA3AF}
+.pay-edit-row{display:grid;grid-template-columns:80px 1fr 100px 1fr 28px;gap:6px;margin-bottom:6px;align-items:center}
+.pay-edit-row .field-input{font-size:12px;padding:5px 8px}
+.proj-edit-row{display:grid;grid-template-columns:140px 1fr 28px;gap:6px;margin-bottom:6px;align-items:start}
+.proj-edit-row .field-input,.proj-edit-row .field-textarea{font-size:12px;padding:5px 8px}
+.cup-edit-row{display:grid;grid-template-columns:130px 90px 1fr 28px;gap:8px;margin-bottom:8px;align-items:center}
+.cup-edit-row .field-input{font-size:12px;padding:5px 8px}
+.ind-edit-row{display:grid;grid-template-columns:140px 150px 1fr 28px;gap:8px;margin-bottom:8px;align-items:center}
+.ind-edit-row .field-input{font-size:12px;padding:5px 8px}
+.btn-remove{width:26px;height:26px;border-radius:6px;border:1px solid #FEE2E2;background:#FEF2F2;color:#B91C1C;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.btn-remove:hover{background:#FEE2E2}
+.btn-add-row{font-size:12px;padding:6px 12px;border-radius:7px;border:1px dashed #D1D5DB;background:transparent;color:#6B7280;cursor:pointer;font-family:inherit;margin-top:4px;width:100%}
+.btn-add-row:hover{background:#F9FAFB;border-color:#9CA3AF}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding-top:1rem;border-top:1px solid #F3F4F6;margin-top:1rem}
+.toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;font-size:13px;padding:10px 16px;border-radius:10px;font-weight:500;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;display:flex;align-items:center;gap:6px}
+.toast.show{opacity:1}
+.col-hdr{font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand">
+    <div>
+      <div class="brand-name">TripleTen Brasil</div>
+      <div class="brand-sub">Dashboard de Cursos — Closers e SDRs</div>
+    </div>
+    <div class="brand-right">
+      <div class="sync-status"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Pronto</span></div>
+      <button class="btn" id="editBtn" onclick="openEdit()"><i class="ti ti-edit" style="font-size:14px" aria-hidden="true"></i> Editar</button>
+    </div>
+  </div>
+
+  <div class="main-nav">
+    <button class="mnav on" data-v="cursos" onclick="setView('cursos')"><i class="ti ti-book" style="font-size:14px" aria-hidden="true"></i> Cursos</button>
+    <button class="mnav" data-v="cupons" onclick="setView('cupons')"><i class="ti ti-tag" style="font-size:14px" aria-hidden="true"></i> Cupons de desconto</button>
+    <button class="mnav" data-v="indicacao" onclick="setView('indicacao')"><i class="ti ti-users" style="font-size:14px" aria-hidden="true"></i> Links de indicação</button>
+  </div>
+
+  <div id="view-cursos">
+    <div class="course-pills" id="pills"></div>
+    <div id="course-main"></div>
+  </div>
+  <div id="view-cupons" style="display:none"><div id="cupons-main"></div></div>
+  <div id="view-indicacao" style="display:none"><div id="ind-main"></div></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Editar</div>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="modal-tabs" id="modalTabs">
+      <button class="modal-tab on" onclick="switchTab('turma')">Turma e links</button>
+      <button class="modal-tab" onclick="switchTab('conteudo')">Conteúdo</button>
+      <button class="modal-tab" onclick="switchTab('projetos')">Projetos</button>
+      <button class="modal-tab" onclick="switchTab('pagamentos')">Pagamentos</button>
+    </div>
+    <div id="tab-turma" class="tab-panel on"></div>
+    <div id="tab-conteudo" class="tab-panel"></div>
+    <div id="tab-projetos" class="tab-panel"></div>
+    <div id="tab-pagamentos" class="tab-panel"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn primary" id="saveBtn">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check" style="font-size:14px" aria-hidden="true"></i><span id="toastMsg">Salvo!</span></div>
+
+<script>
+// ── STATIC META (labels, colors, fixed content) ───────────────────────────
+const META={
+  qa:{label:"QA Engineer",dot:"#047857",pb:"#D1FAE5",pbc:"#047857",ptc:"#065F46",dur:"5 meses",cargos:"Analista de QA Jr. | QA Engineer Jr.",skills:"• Testes manuais e automatizados\n• Selenium WebDriver\n• Python + Pytest\n• Postman (testes de API)\n• Android Studio (mobile)\n• SQL e banco de dados\n• Git e versionamento\n• Figma (análise de layout)\n• Charles Proxy",soft:"• Atenção aos detalhes\n• Pensamento analítico e crítico\n• Comunicação clara com equipes técnicas\n• Capacidade de documentar processos\n• Proatividade na identificação de bugs"},
+  wd:{label:"Web Dev",dot:"#1D4ED8",pb:"#DBEAFE",pbc:"#1D4ED8",ptc:"#1E3A8A",dur:"10 meses",cargos:"Dev Frontend Jr. | Dev React Jr. | Dev Node.js Jr.",skills:"• HTML5 semântico + CSS avançado (Flexbox, Grid, BEM)\n• JavaScript intermediário/avançado\n• React.js (hooks, Context API, React Router)\n• Node.js + Express.js\n• MongoDB (NoSQL)\n• APIs REST\n• Git / GitHub + Webpack\n• JWT (autenticação)\n• Figma (leitura de layouts)",soft:"• Colaboração e uso profissional do Git\n• Comunicação técnica (explicar abordagens)\n• Autodidatismo e busca por soluções\n• Adaptabilidade a novas tecnologias"},
+  da:{label:"Data Analytics",dot:"#B91C1C",pb:"#FEE2E2",pbc:"#B91C1C",ptc:"#7F1D1D",dur:"7 meses",cargos:"Analista de Dados Jr. | Analista de BI Jr.",skills:"• Python (Pandas, Matplotlib, Seaborn, Plotly, Dash, SciPy, Sklearn)\n• SQL + PySpark\n• Tableau\n• Jupyter Notebook / Google Colab / Anaconda\n• Testes A/B e teste de hipóteses\n• Pipelines de dados (SQLAlchemy, PostgreSQL)\n• AWS\n• Data Storytelling",soft:"• Entender rapidamente o modelo de negócio do cliente\n• Levantar métricas relevantes\n• Comunicar descobertas de forma simples para executivos\n• Pensamento analítico e orientação a resultados"},
+  ds:{label:"Data Science",dot:"#B45309",pb:"#FEF3C7",pbc:"#B45309",ptc:"#78350F",dur:"9 meses",cargos:"Cientista de Dados Jr. | Engenheiro de ML Jr.",skills:"• Probabilidade e estatística\n• Machine Learning (regressão, classificação, clustering)\n• Python (Pandas, NumPy, Matplotlib, Scikit-learn, Keras)\n• SQL + PySpark\n• NLTK (NLP)\n• CatBoost, LightGBM, XGBoost\n• Jupyter Notebook / Anaconda\n• Git / GitHub",soft:"• Aprender rapidamente tecnologias novas\n• Identificar aplicações de modelos relevantes ao negócio\n• Comunicar descobertas para audiências não técnicas\n• Visão estratégica orientada a resultados"},
+  mbads:{label:"MBA DS & IA",dot:"#6D28D9",pb:"#EDE9FE",pbc:"#6D28D9",ptc:"#3B0764",dur:"10 meses",cargos:"Cientista de Dados | Engenheiro de ML | Pesquisador de IA (Jr./Pleno)",skills:"• Python (Pandas, NumPy, Matplotlib, Scikit-learn, Keras)\n• SQL + PostgreSQL + SQLAlchemy + PySpark\n• CatBoost, LightGBM, XGBoost\n• NLTK + pymystem (NLP)\n• Dash + Plotly\n• Data pipelines + Testes A/B\n• CLI + Jupyter Notebook / VS Code",soft:"• Teamwork — colaboração em projetos reais\n• Problem Solving — resolução estruturada\n• Time Management — gestão de prazos em sprints\n• Adaptability — tecnologias em constante evolução"},
+  mbada:{label:"MBA DA & IA",dot:"#DC2626",pb:"#FEE2E2",pbc:"#DC2626",ptc:"#7F1D1D",dur:"9 meses",cargos:"Analista de Dados | Analista de BI | foco em IA",skills:"• Python (Pandas, Matplotlib, Seaborn, Plotly, Dash, Scikit-learn)\n• SQL + PostgreSQL\n• Tableau\n• Machine Learning aplicado à análise\n• Testes A/B + Pipelines de dados\n• Data Storytelling + AWS",soft:"• Comunicação de dados para tomadores de decisão\n• Pensamento analítico e crítico\n• Orientação a resultados de negócio\n• Colaboração com times multidisciplinares"},
+  mbaia:{label:"MBA IA Negócios",dot:"#EA580C",pb:"#FFEDD5",pbc:"#EA580C",ptc:"#7C2D12",dur:"9 meses",cargos:"Analista de IA | Consultor de IA | Gestor de Projetos de IA",skills:"• Fundamentos de IA e Machine Learning\n• Python para análise e automação\n• Ferramentas de IA generativa (ChatGPT, Copilot)\n• Prompt engineering\n• Análise de dados para tomada de decisão\n• Liderança e gestão de projetos de IA\n• Ética e governança de IA",soft:"• Visão estratégica orientada a negócio\n• Liderança de equipes técnicas e multidisciplinares\n• Comunicação executiva (apresentar IA para C-level)\n• Pensamento crítico e ético sobre o uso de IA\n• Gestão de mudança e inovação"}
+};
+const IDS=["qa","wd","da","ds","mbads","mbada","mbaia"];
+
+// ── DEFAULT EDITABLE DATA ─────────────────────────────────────────────────
+const DEF_COURSES={
+  qa:{next:"08/07 (real)",mat:"https://tripleten.com/home/qa-engineer/?country=pt-bra",grade:"https://drive.google.com/file/d/1nXWOBNc56mpyGLHe61R3Eosk5H068WhI/view",script:"https://docs.google.com/document/d/1KfHIAHmqp4QM7GsclZIgS6tgZdKae8ICBcx2SN1lVYc/edit",oque:"O Analista de QA garante a qualidade nos processos de desenvolvimento de software, trabalhando diretamente com a equipe de dev. Valida que o produto está em conformidade antes de chegar ao cliente.\n\nNem todo dev terá essa visão macro — o QA lida diretamente com códigos e automatizações para garantir o funcionamento correto do produto.",mercado:"• Qualquer empresa que desenvolva software\n• Fintechs, e-commerce, saúde digital, startups\n• Times ágeis que precisam de validação contínua\n• Grandes empresas com squads de produto",projs:[["Projeto 1","Teste de fumaça e regressão (Urban Routes) — listas de verificação, casos de teste, relatório de bug"],["Projeto 2","Testar documentação (Urban Routes) — análise de requisitos, mapa mental, fluxograma"],["Projeto 3","Teste do app web (Urban Routes) — frontend, testes positivos/negativos, validação de formulários"],["Projeto 4","Teste de API (Urban Grocers) — Postman, SOAP, valores de limite"],["Projeto 5","Teste de aplicativo móvel — emulador Android Studio, coleta de logs"],["Projeto 6","Logs e banco de dados em servidor remoto — SSH, terminal, SQL"],["Projeto 7","Automatizando testes de API — Python + Pytest + requests"],["Projeto 8","Automatizando testes de UI — Selenium + Page Object Model"],["Projeto final","Teste completo do Urban Scooter — web + mobile + API"]],pays:[["Cheio","Rebill à vista","R$8.609","https://pay.rebill.com/tripleten-brazil/pl_4deae9b6a3574c8092388cfcca3212fa"],["Cheio","Stripe à vista","R$8.609","https://buy.stripe.com/4gM00keqnecE7Qd6gzbfV3S"],["Cheio","Rebill Cartão 12x","12x R$817","https://pay.rebill.com/tripleten-brazil/pl_db87db468979404bbf24e7c2fb8f689d"],["Cheio","Stripe Recorrência 5x","5x R$1.971","https://pay.tripleten.com/autologin/qa-engineer/monthly/?country_code=br"],["Cheio","Rebill Recorrência 5x","5x R$1.971","https://pay.rebill.com/tripleten-brazil/pl_60d39f0f59fc47958a0b95829316c057"],["5%","Rebill à vista","R$8.178","https://pay.rebill.com/tripleten-brazil/pl_4deae9b6a3574c8092388cfcca3212fa"],["10%","Rebill à vista","R$7.748","https://pay.rebill.com/tripleten-brazil/pl_4deae9b6a3574c8092388cfcca3212fa"],["10%","Rebill Cartão 12x","12x R$736","https://pay.rebill.com/tripleten-brazil/pl_db87db468979404bbf24e7c2fb8f689d"],["15%","Rebill à vista","R$7.317","https://pay.rebill.com/tripleten-brazil/pl_4deae9b6a3574c8092388cfcca3212fa"],["15%","Rebill Cartão 12x","12x R$695","https://pay.rebill.com/tripleten-brazil/pl_db87db468979404bbf24e7c2fb8f689d"],["30%","Stripe à vista (margem)","R$4.762","https://pay.tripleten.com/qa-engineer/upfront/?country_code=br"],["Rec. longa 6x","Rebill entrada 20% + 6x","R$1.722 + 6x R$1.265","https://pay.rebill.com/tripleten-brazil/pl_e24bc1b73e824a4092be9cee45e18cdd"],["Rec. longa 10x","Rebill entrada 20% + 10x","R$1.722 + 10x R$801","https://pay.rebill.com/tripleten-brazil/pl_4a42cefaf1e84c22864490f013bab551"]]},
+  wd:{next:"01/07 (real)",mat:"https://tripleten.com/home/web/?country=pt-bra",grade:"https://drive.google.com/file/d/1HureSgav6EZiXhJluAf1vwiMMwIy1X_Q/view",script:"https://docs.google.com/document/d/1KfHIAHmqp4QM7GsclZIgS6tgZdKae8ICBcx2SN1lVYc/edit",oque:"Fullstack Developers constroem Frontend e Backend com JavaScript. Criam aplicações web completas com bancos de dados em ambientes locais e de produção.\n\nO que os formandos saberão fazer:\n• Criar aplicações web completas\n• React com Context API e reducers\n• Arquitetura Frontend + Backend com Node.js e MongoDB\n• Autenticação com JWT e segurança básica\n• Versionamento com Git e deploy em servidor online",mercado:"• Dev Frontend (Jr., possivelmente Pleno com bom desempenho)\n• Dev React Jr. | Dev Node.js Jr.\n• Dev Backend Jr.\n• Qualquer empresa que desenvolva produtos digitais",projs:[["Projeto 1","Página 'Sobre mim' — HTML e CSS básico"],["Projetos 2–3","Triple Peaks Library — BEM, Flexbox, Git, estrutura de arquivos"],["Projeto 4","Landing page cafeteria — fontes externas, vídeos, formulários"],["Projetos 5–6","De Homeland para Homeland — responsivo, Figma, Grid Layout"],["Projetos 7–11","Around the U.S. (5 partes) — JS, DOM, POO, Webpack"],["Projeto 12","Around the U.S. — deploy via API assíncrona e Promessas"],["Projetos 13–14","Around the U.S. React — rotas, Context API, Redux"],["Projetos 15–16","Backend Node.js + MongoDB — servidor Express, API REST"],["Projetos 17–18","Autenticação Frontend + Backend — JWT, SSL, deploy"],["Projeto final","Projeto livre: app Frontend com API de terceiros ou Full-stack próprio"]],pays:[["Cheio","Rebill à vista","R$12.914","https://pay.rebill.com/tripleten-brazil/pl_0c87491f90454c2db33ff93654f4379f"],["Cheio","Stripe à vista","R$12.914","https://buy.stripe.com/00weVe81Z2tW3zXcEXbfV3P"],["Cheio","Rebill Cartão 12x","12x R$1.226","https://pay.rebill.com/tripleten-brazil/pl_8bdc75839ce34e00b3dc0f2a3c25a850"],["Cheio","Stripe Recorrência 10x","10x R$1.556","https://pay.tripleten.com/autologin/web/monthly/?country_code=br"],["Cheio","Rebill Recorrência 10x","10x R$1.556","https://pay.rebill.com/tripleten-brazil/pl_eb4db9dc37534a218c154cb752223a97"],["5%","Rebill à vista","R$12.268","https://pay.rebill.com/tripleten-brazil/pl_0c87491f90454c2db33ff93654f4379f"],["10%","Rebill à vista","R$11.622","https://pay.rebill.com/tripleten-brazil/pl_0c87491f90454c2db33ff93654f4379f"],["10%","Rebill Cartão 12x","12x R$1.104","https://pay.rebill.com/tripleten-brazil/pl_8bdc75839ce34e00b3dc0f2a3c25a850"],["15%","Rebill à vista","R$10.976","https://pay.rebill.com/tripleten-brazil/pl_0c87491f90454c2db33ff93654f4379f"],["15%","Rebill Cartão 12x","12x R$1.042","https://pay.rebill.com/tripleten-brazil/pl_8bdc75839ce34e00b3dc0f2a3c25a850"],["30%","Stripe à vista (margem)","R$9.999","https://pay.tripleten.com/web/upfront/?country_code=br"],["Rec. longa 12x","Rebill entrada 20% + 12x","R$2.583 + 12x R$1.028","https://pay.rebill.com/tripleten-brazil/pl_9fa810a8432a499ab140411845a83c98"],["Rec. longa 20x","Rebill entrada 20% + 20x","R$2.583 + 20x R$684","https://pay.rebill.com/tripleten-brazil/pl_d05bfbbeff7249d99d2ad7ebfbea066e"]]},
+  da:{next:"01/07 (15/07 real)",mat:"https://tripleten.com/home/data-analyst/?country=pt-bra",grade:"https://drive.google.com/file/d/15c2t3dQKsD8bzPIFPFskMcqtFcsL-965/view",script:"https://docs.google.com/document/d/1KfHIAHmqp4QM7GsclZIgS6tgZdKae8ICBcx2SN1lVYc/edit",oque:"O Analista de Dados resolve questões com base em dados, usando tecnologia, probabilidade, estatística e métricas de negócios.\n\nExemplos de perguntas que responde:\n• Quais clientes geram maior receita?\n• Em quais datas há pico de custos?\n• Qual é a tendência de consumo de um produto?\n\nO relatório 'Jobs of Tomorrow' aponta análise de dados como um dos empregos com maior crescimento até 2025.",mercado:"• Bancos, varejo, imóveis, educação, saúde\n• Governos (monitoramento de políticas públicas)\n• ONGs (análise de impacto)\n• E-commerce e startups orientadas a dados\n• Qualquer empresa que queira decisões baseadas em dados",projs:[["Sprint 1","Qualidade de dados (Store 1 / e-commerce) — preparo de dados de clientes"],["Sprint 2","Streaming de música — comparação de preferências entre cidades"],["Sprint 3","Instacart — plano de análise para plataforma de entrega"],["Sprint 4","Megaline — qual plano (Surf ou Ultimate) gera mais receita?"],["Sprint 5","Dashboard em nuvem — criação e deploy de dashboard público"],["Sprint 6","Videogames (loja Ice) — padrões que determinam sucesso de jogos"],["Sprint 7","Caronas compartilhadas — análise de concorrência + teste de hipótese"],["Sprint 8","Marketing digital — ROI por canal, recomendações de investimento"],["Sprint 9","Teste A/B (loja online) — aumento de receita via experimento controlado"],["Sprint 10","Cafeteria com robôs (LA) — insights para modelo escalável"],["Sprint 11","Funil de vendas + Teste A/B (startup mobile) — melhoria do app"],["Sprint 12","YouTube Trends — dashboard de análise para agência de publicidade"],["Sprint 13","Academia — análise de perfis e estratégia de retenção de clientes"],["Projeto final","Simulação Jr.: Testes A/B, SQL e priorização de projetos"]],pays:[["Cheio","Rebill à vista","R$10.394","https://pay.rebill.com/tripleten-brazil/pl_183ff8e5b44742869c098837a546b934"],["Cheio","Stripe à vista","R$10.394","https://buy.stripe.com/bJe9AUcif6Kc9YldJ1bfV3Q"],["Cheio","Rebill Cartão 12x","12x R$987","https://pay.rebill.com/tripleten-brazil/pl_8d8e784c86774743824a64e5c76e655c"],["Cheio","Stripe Recorrência 7x","7x R$1.711","https://pay.tripleten.com/autologin/data-analyst/monthly/?country_code=br"],["Cheio","Rebill Recorrência 7x","7x R$1.711","https://pay.rebill.com/tripleten-brazil/pl_53af5f1416ba4c41b9d5c0ca12c13355"],["5%","Rebill à vista","R$9.874","https://pay.rebill.com/tripleten-brazil/pl_183ff8e5b44742869c098837a546b934"],["10%","Rebill à vista","R$9.354","https://pay.rebill.com/tripleten-brazil/pl_183ff8e5b44742869c098837a546b934"],["10%","Rebill Cartão 12x","12x R$888","https://pay.rebill.com/tripleten-brazil/pl_8d8e784c86774743824a64e5c76e655c"],["15%","Rebill à vista","R$8.834","https://pay.rebill.com/tripleten-brazil/pl_183ff8e5b44742869c098837a546b934"],["15%","Rebill Cartão 12x","12x R$839","https://pay.rebill.com/tripleten-brazil/pl_8d8e784c86774743824a64e5c76e655c"],["30%","Stripe à vista (margem)","R$6.047","https://pay.tripleten.com/data-analyst/upfront/?country_code=br"],["Rec. longa 9x","Rebill entrada 20% + 9x","R$2.079 + 9x R$1.060","https://pay.rebill.com/tripleten-brazil/pl_db86d1ebc4aa4963bdaf35c3f92d9dc1"],["Rec. longa 14x","Rebill entrada 20% + 14x","R$2.079 + 14x R$728","https://pay.rebill.com/tripleten-brazil/pl_ed0dee20fbe047e197da522fa6c66296"]]},
+  ds:{next:"08/07 (22/07 real)",mat:"https://tripleten.com/home/data-scientist/?country=pt-bra",grade:"https://drive.google.com/file/d/1927pkzG9PyVCtkkoSnx-Ok67WHXt_rw7/view",script:"https://docs.google.com/document/d/1KfHIAHmqp4QM7GsclZIgS6tgZdKae8ICBcx2SN1lVYc/edit",oque:"O Cientista de Dados coleta, limpa e cria modelos preditivos para apoiar tomada de decisões.\n\nDiferença para o Analista de Dados:\n• Analista → responde perguntas atuais com dados do passado\n• Cientista → captura padrões históricos para PREVER valores futuros\n\nO relatório 'Jobs of Tomorrow' aponta ciência de dados como um dos empregos com maior crescimento até 2025.",mercado:"• Qualquer organização que use dados de forma preditiva\n• Fintechs, saúde, varejo, indústria, logística\n• Setor público e privado\n• Empresas com grandes volumes de dados transacionais",projs:[["Sprints 1–7","Base compartilhada com DA — Store 1, música, Instacart, Megaline, dashboard, videogames, caronas"],["Sprint 8","Recomendação de plano de telefonia — modelo de classificação"],["Sprint 9","Previsão de churn bancário — modelo + recomendações de retenção"],["Sprint 10","Mineração — previsão de volume de reservas em novos poços"],["Sprint 11","Seguradora — modelo com proteção de dados pessoais"],["Sprint 12","Venda de automóveis usados — modelo de precificação"],["Sprint 13","Táxis — previsão de pico de demanda por hora"],["Sprint 14","Classificação de críticas de filmes (NLP) — filtragem e categorização"],["Sprint 15","Verificação de idades (visão computacional) — conformidade com lei de álcool"],["Projeto final","Simulação Jr.: manipulação de dados e ML em cenários reais de negócio"]],pays:[["Cheio","Rebill à vista","R$14.804","https://pay.rebill.com/tripleten-brazil/pl_cf4d4e23c14444649672b8a1e45e3d6b"],["Cheio","Stripe à vista","R$14.804","https://buy.stripe.com/8x28wQeqn5G83zXawPbfV3R"],["Cheio","Rebill Cartão 12x","12x R$1.406","https://pay.rebill.com/tripleten-brazil/pl_b0fe3f33c1df4924b1dfb678882ca842"],["Cheio","Stripe Recorrência 9x","9x R$1.945","https://pay.tripleten.com/autologin/data-scientist/monthly/?country_code=br"],["Cheio","Rebill Recorrência 9x","9x R$1.945","https://pay.rebill.com/tripleten-brazil/pl_538cb0d4541f4b40b3b2610dd5cb18a7"],["5%","Rebill à vista","R$14.063","https://pay.rebill.com/tripleten-brazil/pl_cf4d4e23c14444649672b8a1e45e3d6b"],["10%","Rebill à vista","R$13.323","https://pay.rebill.com/tripleten-brazil/pl_cf4d4e23c14444649672b8a1e45e3d6b"],["10%","Rebill Cartão 12x","12x R$1.265","https://pay.rebill.com/tripleten-brazil/pl_b0fe3f33c1df4924b1dfb678882ca842"],["15%","Rebill à vista","R$12.583","https://pay.rebill.com/tripleten-brazil/pl_cf4d4e23c14444649672b8a1e45e3d6b"],["15%","Rebill Cartão 12x","12x R$1.195","https://pay.rebill.com/tripleten-brazil/pl_b0fe3f33c1df4924b1dfb678882ca842"],["30%","Stripe à vista (margem)","R$8.617","https://pay.tripleten.com/data-scientist/upfront/?country_code=br"],["Rec. longa 12x","Rebill entrada 20% + 12x","R$2.961 + 12x R$1.179","https://pay.rebill.com/tripleten-brazil/pl_558c11233bcf4deb92996f5c8fd25008"],["Rec. longa 18x","Rebill entrada 20% + 18x","R$2.961 + 18x R$850","https://pay.rebill.com/tripleten-brazil/pl_e8ce2b7d4d774d37800dbfcfcddfbd0e"]]},
+  mbads:{next:"08/07 (real)",mat:"https://tripleten.com/home/mba-data-scientist/?country=pt-bra",grade:"MBA_DS_AI.pdf",script:"https://docs.google.com/document/d/1KfHIAHmqp4QM7GsclZIgS6tgZdKae8ICBcx2SN1lVYc/edit",oque:"Pós-graduação que prepara os alunos para atuar com Ciência de Dados e IA no mercado. Combina teoria, prática, projetos reais e suporte especializado.\n\nDados de mercado:\n• Indeed (2023): profissão de cientista de dados foi a mais procurada — busca subiu ~4.000%\n• Pesquisa TOTVS/H2R: cientista de dados entre as profissões mais relevantes no Brasil até 2030",mercado:"• Organizações com dados estruturados e não estruturados\n• Fintechs, saúde, indústria 4.0, varejo, agro\n• Empresas que desenvolvem produtos com IA\n• Consultorias de dados e analytics",projs:[["Sprints 1–7","Base compartilhada com DS — Store 1, música, Instacart, Megaline, dashboard, videogames, caronas"],["Sprints 8–15","Projetos avançados de ML e IA — classificação, churn, mineração, seguradora, precificação, táxis, NLP, visão computacional"],["Projeto final","Simulação completa Jr. — manipulação de dados e ML em cenários reais de negócio"]],pays:[["Cheio","Rebill à vista","R$36.225","https://pay.rebill.com/tripleten-brazil/pl_8f5bacf584c1442caa91c34e6b3e423f"],["Cheio","Stripe à vista","R$36.225","https://buy.stripe.com/6oUbJ20zx3y08UheN5bfV3T"],["Cheio","Rebill Cartão 12x","12x R$3.441","https://pay.rebill.com/tripleten-brazil/pl_49bdde1a1efe47ec823f033f7a009192"],["Cheio","Rebill Recorrência 10x","10x R$4.311","https://checkout.rebill.com/tripleten-brazil/pl_9b142b9d8f464e73a1ecafddb81e0059"],["5%","Rebill à vista (cupom Mar5)","R$34.414","https://pay.rebill.com/tripleten-brazil/pl_8f5bacf584c1442caa91c34e6b3e423f"],["10%","Rebill à vista (cupom Triple10)","R$32.603","https://pay.rebill.com/tripleten-brazil/pl_8f5bacf584c1442caa91c34e6b3e423f"],["15%","Rebill à vista (cupom MARCHSTART15)","R$30.791","https://pay.rebill.com/tripleten-brazil/pl_8f5bacf584c1442caa91c34e6b3e423f"]]},
+  mbada:{next:"15/07 (real)",mat:"",grade:"https://drive.google.com/file/d/1MQw-7asYS5bDXIMUoL7OncTxT-lM5lcI/view?usp=sharing",script:"https://docs.google.com/document/d/1KfHIAHmqp4QM7GsclZIgS6tgZdKae8ICBcx2SN1lVYc/edit",oque:"Pós-graduação que combina Análise de Dados com aplicações práticas de IA.\n\nO aluno aprende desde a preparação de dados até modelos de IA para insights estratégicos.\n\nVoltado para quem quer evoluir de analista para papéis mais estratégicos com IA.",mercado:"• Empresas de todos os setores com cultura de dados\n• Times de BI e Analytics\n• Consultorias de dados e startups orientadas a dados\n• Posições de liderança (Data Lead, Analytics Manager)",projs:[["Sprints 1–13","Projetos compartilhados com DA — do Store 1 até retenção de academia"],["Projeto final","Simulação completa Jr. com foco em IA — ML e IA aplicados a cenários de análise de dados"]],pays:[["Cheio","Rebill à vista","R$36.225","https://pay.rebill.com/tripleten-brazil/pl_d0bd68b6e9ff4db6b67fcf48c7dfad21"],["Cheio","Rebill Cartão 12x","12x R$3.441","https://pay.rebill.com/tripleten-brazil/pl_584e36af693d45dbae55510588799918"],["Cheio","Rebill Recorrência 10x","10x R$4.311","https://pay.rebill.com/tripleten-brazil/pl_319abc5f2ccd4ef8b09d4f73983202aa"],["5%","Usar cupom Mar5","R$34.414",""],["10%","Usar cupom Triple10","R$32.603",""],["15%","Usar cupom MARCHSTART15","R$30.791",""]]},
+  mbaia:{next:"22/07 (real)",mat:"",grade:"https://drive.google.com/file/d/1W2E8zrc2vhuld7JgHTgWsnSrQPLgz1R3/view?usp=sharing",script:"https://docs.google.com/document/d/1KfHIAHmqp4QM7GsclZIgS6tgZdKae8ICBcx2SN1lVYc/edit",oque:"MBA focado na aplicação prática de IA no contexto de negócios.\n\nVoltado para profissionais que querem aplicar IA para resolver problemas reais de gestão e estratégia.\n\nCombina fundamentos técnicos de IA com visão de negócio e tomada de decisão orientada a dados.",mercado:"• Empresas implementando IA nos processos\n• Consultorias de transformação digital\n• Times de produto e inovação\n• Gestores que precisam liderar iniciativas de IA\n• Qualquer setor: financeiro, saúde, varejo, indústria, educação",projs:[["Projetos práticos","Aplicações de IA em casos reais de negócio — projetos hands-on com ferramentas de IA"],["Projeto final","Proposta de solução com IA — desenvolvimento e apresentação de solução completa para um problema real de negócio"]],pays:[["Cheio","Rebill à vista","R$31.250","https://pay.rebill.com/tripleten-brazil/pl_0e5d8f25008a40aea8f5374bf10f25bb"],["Cheio","Rebill 50% entrada + 6 parcelas","R$11.250 + 6x R$3.719","https://pay.rebill.com/tripleten-brazil/pl_3eef6cfc3eb9411e9111c4dbf1eacda0"],["Cheio","Rebill Recorrência 10x","10x R$3.719","https://pay.rebill.com/tripleten-brazil/pl_46828c5015ef42d5b8834f151d435804"],["5%","Usar cupom Mar5","~R$29.687",""],["10%","Usar cupom Triple10","~R$28.125",""],["15%","Usar cupom MARCHSTART15","~R$26.562",""]]}
+};
+const DEF_CUPONS=[
+  {code:"Mar5",disc:"5% OFF",obs:"Válido para todos os bootcamps"},
+  {code:"Triple10",disc:"10% OFF",obs:"Válido para todos os bootcamps"},
+  {code:"MARCHSTART15",disc:"15% OFF",obs:"Válido para todos os bootcamps"},
+  {code:"Start20",disc:"20% OFF",obs:"Válido para todos os bootcamps"},
+  {code:"TripleTen30",disc:"30% OFF",obs:"Válido para todos os bootcamps"}
+];
+const DEF_IND=[
+  {sup:"Ana Viana",name:"Natália Martins",link:"https://get.tripleten.com/Natalia"},
+  {sup:"Ana Viana",name:"Bruno Marques",link:"https://get.tripleten.com/BrunoMarques"},
+  {sup:"Larissa Ciuldim",name:"Larissa Ciuldim",link:"https://get.tripleten.com/Larissa"},
+  {sup:"Larissa Ciuldim",name:"Riane Chagas",link:"https://get.tripleten.com/RianeChagas"},
+  {sup:"Larissa Ciuldim",name:"Jonathan Vieira",link:"https://get.tripleten.com/JonathanVieira"},
+  {sup:"Roberto",name:"Jessica Silva",link:"https://get.tripleten.com/JessicaSilva"},
+  {sup:"Roberto",name:"Yanara Silva",link:"https://get.tripleten.com/YanaraSilva"},
+  {sup:"Roberto",name:"Lucas Bonow",link:"https://get.tripleten.com/LucasBonow"},
+  {sup:"Supervisores",name:"Roberto Branco",link:"https://get.tripleten.com/RobertoBranco"},
+  {sup:"Supervisores",name:"Luâine Almeida",link:"https://get.tripleten.com/LuaineAlmeida"}
+];
+
+// ── PAYMENT PILL COLORS ───────────────────────────────────────────────────
+const PAY_COLORS={Cheio:["#D1FAE5","#065F46"],"5%":["#DBEAFE","#1E3A8A"],"10%":["#EDE9FE","#3B0764"],"15%":["#FEF3C7","#78350F"],"30%":["#FFEDD5","#7C2D12"],"Rec.":["#FBEAF0","#72243E"]};
+function payColor(d){for(const[k,v]of Object.entries(PAY_COLORS))if(d.startsWith(k))return v;return["#F3F4F6","#374151"];}
+
+// CUPOM PILL COLORS
+const CUP_COLORS={"5%":["#DBEAFE","#1E3A8A"],"10%":["#EDE9FE","#3B0764"],"15%":["#D1FAE5","#065F46"],"20%":["#FEF3C7","#78350F"],"30%":["#FEE2E2","#7F1D1D"]};
+function cupColor(d){for(const[k,v]of Object.entries(CUP_COLORS))if(d.includes(k))return v;return["#F3F4F6","#374151"];}
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let COURSES, CUPONS, IND;
+let activeId="qa", openSecs={}, currentView="cursos";
+let modalMode="course", editCourse=null, editCupons=[], editInd=[], activeTab="turma";
+
+function load(){
+  try{COURSES=JSON.parse(localStorage.getItem("tt_courses")||"null")||JSON.parse(JSON.stringify(DEF_COURSES));}catch(e){COURSES=JSON.parse(JSON.stringify(DEF_COURSES));}
+  try{CUPONS=JSON.parse(localStorage.getItem("tt_cupons")||"null")||JSON.parse(JSON.stringify(DEF_CUPONS));}catch(e){CUPONS=JSON.parse(JSON.stringify(DEF_CUPONS));}
+  try{IND=JSON.parse(localStorage.getItem("tt_ind")||"null")||JSON.parse(JSON.stringify(DEF_IND));}catch(e){IND=JSON.parse(JSON.stringify(DEF_IND));}
+}
+function save(){
+  try{localStorage.setItem("tt_courses",JSON.stringify(COURSES));}catch(e){}
+  try{localStorage.setItem("tt_cupons",JSON.stringify(CUPONS));}catch(e){}
+  try{localStorage.setItem("tt_ind",JSON.stringify(IND));}catch(e){}
+}
+
+// ── MAIN NAV ──────────────────────────────────────────────────────────────
+function setView(v){
+  currentView=v;
+  document.querySelectorAll(".mnav").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  document.getElementById("view-cursos").style.display=v==="cursos"?"block":"none";
+  document.getElementById("view-cupons").style.display=v==="cupons"?"block":"none";
+  document.getElementById("view-indicacao").style.display=v==="indicacao"?"block":"none";
+  const eb=document.getElementById("editBtn");
+  eb.style.display=v==="cursos"?"flex":"none";
+  document.getElementById("cupons-edit-btn").style.display=v==="cupons"?"flex":"none";
+  document.getElementById("ind-edit-btn").style.display=v==="indicacao"?"flex":"none";
+  if(v==="cupons")renderCupons();
+  if(v==="indicacao")renderInd();
+}
+
+// ── COURSES ───────────────────────────────────────────────────────────────
+function buildPills(){
+  document.getElementById("pills").innerHTML=IDS.map(id=>{
+    const m=META[id];
+    return`<button class="pill${activeId===id?" on":""}" onclick="selCourse('${id}')" style="${activeId===id?`background:${m.pb};border-color:${m.pbc};color:${m.ptc};border-width:2px`:""}">${m.label}</button>`;
+  }).join("");
+}
+function tog(id){
+  openSecs[id]=!openSecs[id];
+  const b=document.getElementById("sb-"+id),ch=document.getElementById("ch-"+id);
+  if(b)b.style.display=openSecs[id]?"block":"none";
+  if(ch)ch.style.transform=openSecs[id]?"rotate(180deg)":"";
+}
+function renderCourse(){
+  const m=META[activeId],d=COURSES[activeId];
+  const ql=[{l:"Script de atendimento",u:d.script,ic:"ti-file-text"},{l:"Link de matrícula",u:d.mat,ic:"ti-clipboard-check"},{l:"Grade curricular",u:d.grade,ic:"ti-list"}].filter(x=>x.u&&x.u.startsWith("http"));
+  let h=`<div class="course-header"><div class="course-dot" style="background:${m.dot}"></div><div><div class="course-name">${m.label}</div><div class="course-meta">${m.dur} &nbsp;·&nbsp; Próxima turma: <strong>${d.next}</strong> &nbsp;·&nbsp; ${m.cargos}</div></div></div>`;
+  if(ql.length)h+=`<div class="quick-links">${ql.map(l=>`<a class="ql" href="${l.u}" target="_blank"><i class="ti ${l.ic}" style="font-size:18px;color:${m.pbc}" aria-hidden="true"></i><div><span class="ql-label">${l.l}</span><span class="ql-val" style="color:${m.pbc}">Abrir ↗</span></div></a>`).join("")}</div>`;
+  h+=`<div class="sections">`;
+  [["oq","ti-user","O que faz",d.oque],["me","ti-briefcase","Mercado de trabalho",d.mercado],["sk","ti-tool","Skills e ferramentas",m.skills],["so","ti-heart","Soft skills",m.soft]].forEach(([id,ic,ti,body])=>{
+    const isO=openSecs[id]||false;
+    h+=`<div class="sec-block"><div class="sec-head" onclick="tog('${id}')"><div class="sec-head-left"><i class="ti ${ic}" style="font-size:16px;color:${m.pbc}" aria-hidden="true"></i><span class="sec-title" style="color:${m.pbc}">${ti}</span></div><i class="ti ti-chevron-down chevron" id="ch-${id}" style="transform:${isO?"rotate(180deg)":""}"></i></div><div class="sec-body${isO?" open":""}" id="sb-${id}" style="display:${isO?"block":"none"}">${body}</div></div>`;
+  });
+  const isPO=openSecs["pr"]||false;
+  h+=`<div class="sec-block"><div class="sec-head" onclick="tog('pr')"><div class="sec-head-left"><i class="ti ti-layout-grid" style="font-size:16px;color:${m.pbc}" aria-hidden="true"></i><span class="sec-title" style="color:${m.pbc}">Projetos do curso</span></div><i class="ti ti-chevron-down chevron" id="ch-pr" style="transform:${isPO?"rotate(180deg)":""}"></i></div><div id="sb-pr" style="display:${isPO?"block":"none"}">${d.projs.map((p,i)=>`<div class="proj-row" style="background:${i%2===0?"#F9FAFB":"#fff"}"><div class="proj-name" style="color:${m.ptc}">${p[0]}</div><div class="proj-desc">${p[1]}</div></div>`).join("")}</div></div>`;
+  const isPayO=openSecs["pay"]||false;
+  h+=`<div class="sec-block"><div class="sec-head" onclick="tog('pay')"><div class="sec-head-left"><i class="ti ti-credit-card" style="font-size:16px;color:${m.pbc}" aria-hidden="true"></i><span class="sec-title" style="color:${m.pbc}">Formas de pagamento</span></div><i class="ti ti-chevron-down chevron" id="ch-pay" style="transform:${isPayO?"rotate(180deg)":""}"></i></div><div id="sb-pay" class="pay-wrap" style="display:${isPayO?"block":"none"}"><table><thead><tr><th>Desconto</th><th>Método</th><th>Valor</th><th>Link</th></tr></thead><tbody>${d.pays.map(p=>{const[bg,tc]=payColor(p[0]);return`<tr><td><span class="dpill" style="background:${bg};color:${tc}">${p[0]}</span></td><td>${p[1]}</td><td style="font-weight:600">${p[2]}</td><td>${p[3]?`<a class="plink" href="${p[3]}" target="_blank" style="color:${m.pbc}">Abrir ↗</a>`:"—"}</td></tr>`;}).join("")}</tbody></table></div></div>`;
+  h+=`</div>`;
+  document.getElementById("course-main").innerHTML=h;
+}
+function selCourse(id){activeId=id;openSecs={};buildPills();renderCourse();}
+
+// ── CUPONS ────────────────────────────────────────────────────────────────
+function renderCupons(){
+  document.getElementById("cupons-main").innerHTML=`<div class="cup-grid">${CUPONS.map(c=>{const[bg,tc]=cupColor(c.disc);return`<div class="cup-card" style="border-color:${bg}"><div class="cup-code">${c.code}</div><div class="cup-disc" style="color:${tc}">${c.disc}</div><div class="cup-obs">${c.obs||""}</div></div>`;}).join("")}</div><div style="font-size:12px;color:#9CA3AF;background:#F9FAFB;border-radius:8px;padding:10px 14px">Cupons são aplicados diretamente no checkout. Para MBA DA & IA e MBA IA Negócios, usar cupom ao invés de link com desconto.</div>`;
+}
+
+// ── INDICAÇÃO ─────────────────────────────────────────────────────────────
+function renderInd(){
+  const groups={};
+  IND.forEach(i=>{if(!groups[i.sup])groups[i.sup]=[];groups[i.sup].push(i);});
+  let rows="";
+  for(const[sup,items]of Object.entries(groups)){
+    items.forEach((item,idx)=>{
+      rows+=`<tr>${idx===0?`<td rowspan="${items.length}" style="font-weight:600;color:#374151;vertical-align:top;padding-top:14px">${sup}</td>`:""}<td>${item.name}</td><td><a class="ind-link" href="${item.link}" target="_blank">${item.link}</a></td></tr>`;
+    });
+  }
+  document.getElementById("ind-main").innerHTML=`<div style="background:#fff;border:0.5px solid #E5E7EB;border-radius:12px;overflow:hidden"><table class="ind-table"><thead><tr><th>Supervisor</th><th>Consultor / SDR</th><th>Link personalizado</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+// ── MODAL COURSES ─────────────────────────────────────────────────────────
+function openEdit(){
+  modalMode="course";
+  editCourse=JSON.parse(JSON.stringify(COURSES[activeId]));
+  document.getElementById("modalTitle").textContent=`Editar — ${META[activeId].label}`;
+  document.getElementById("modalTabs").style.display="flex";
+  buildTabTurma();buildTabConteudo();buildTabProjetos();buildTabPagamentos();
+  switchTab("turma");
+  document.getElementById("saveBtn").onclick=saveCourse;
+  document.getElementById("overlay").classList.add("open");
+}
+function switchTab(t){
+  activeTab=t;
+  document.querySelectorAll(".modal-tab").forEach((b,i)=>b.classList.toggle("on",["turma","conteudo","projetos","pagamentos"][i]===t));
+  document.querySelectorAll(".tab-panel").forEach((p,i)=>p.classList.toggle("on",["turma","conteudo","projetos","pagamentos"][i]===t));
+}
+function buildTabTurma(){
+  const d=editCourse;
+  document.getElementById("tab-turma").innerHTML=`<div class="modal-section"><div class="modal-section-title">Turma e links</div><div class="field-row"><div class="field-group"><div class="field-label">Próxima turma</div><input class="field-input" id="f_next" value="${d.next}"></div><div class="field-group"><div class="field-label">Script de atendimento</div><input class="field-input" id="f_script" value="${d.script}"></div></div><div class="field-row"><div class="field-group"><div class="field-label">Link de matrícula</div><input class="field-input" id="f_mat" value="${d.mat}"></div><div class="field-group"><div class="field-label">Grade curricular</div><input class="field-input" id="f_grade" value="${d.grade}"></div></div></div>`;
+}
+function buildTabConteudo(){
+  const d=editCourse;
+  document.getElementById("tab-conteudo").innerHTML=`<div class="modal-section"><div class="modal-section-title">O que faz</div><div class="field-row full"><div class="field-group"><textarea class="field-textarea" id="f_oque" style="min-height:120px">${d.oque}</textarea></div></div></div><div class="modal-section"><div class="modal-section-title">Mercado de trabalho</div><div class="field-row full"><div class="field-group"><textarea class="field-textarea" id="f_mercado" style="min-height:100px">${d.mercado}</textarea></div></div></div>`;
+}
+function buildTabProjetos(){
+  const d=editCourse;
+  document.getElementById("tab-projetos").innerHTML=`<div class="modal-section"><div class="modal-section-title">Projetos do curso</div><div style="display:grid;grid-template-columns:140px 1fr 28px;gap:6px;margin-bottom:6px"><div class="col-hdr">Sprint / Projeto</div><div class="col-hdr">Descrição</div><div></div></div><div id="projRows">${d.projs.map((p,i)=>`<div class="proj-edit-row"><input class="field-input" id="pjn_${i}" value="${p[0].replace(/"/g,'&quot;')}"><textarea class="field-textarea" id="pjd_${i}" style="min-height:50px">${p[1]}</textarea><button class="btn-remove" onclick="removeProj(${i})"><i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i></button></div>`).join("")}</div><button class="btn-add-row" onclick="addProj()"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i> Adicionar projeto</button></div>`;
+}
+function buildTabPagamentos(){
+  const d=editCourse;
+  document.getElementById("tab-pagamentos").innerHTML=`<div class="modal-section"><div class="modal-section-title">Formas de pagamento</div><div style="display:grid;grid-template-columns:80px 1fr 100px 1fr 28px;gap:6px;margin-bottom:6px"><div class="col-hdr">Desconto</div><div class="col-hdr">Método</div><div class="col-hdr">Valor</div><div class="col-hdr">Link</div><div></div></div><div id="payRows">${d.pays.map((p,i)=>`<div class="pay-edit-row"><input class="field-input" id="pyd_${i}" value="${p[0]}"><input class="field-input" id="pym_${i}" value="${p[1]}"><input class="field-input" id="pyv_${i}" value="${p[2]}"><input class="field-input" id="pyl_${i}" value="${p[3]||""}"><button class="btn-remove" onclick="removePay(${i})"><i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i></button></div>`).join("")}</div><button class="btn-add-row" onclick="addPay()"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i> Adicionar linha</button></div>`;
+}
+function collectCourse(){
+  if(activeTab==="turma"){editCourse.next=v("f_next");editCourse.script=v("f_script");editCourse.mat=v("f_mat");editCourse.grade=v("f_grade");}
+  else if(activeTab==="conteudo"){editCourse.oque=v("f_oque");editCourse.mercado=v("f_mercado");}
+  else if(activeTab==="projetos"){editCourse.projs=editCourse.projs.map((_,i)=>[(document.getElementById(`pjn_${i}`)||{value:""}).value.trim(),(document.getElementById(`pjd_${i}`)||{value:""}).value.trim()]).filter(p=>p[0]||p[1]);}
+  else if(activeTab==="pagamentos"){editCourse.pays=editCourse.pays.map((_,i)=>[(document.getElementById(`pyd_${i}`)||{value:""}).value.trim(),(document.getElementById(`pym_${i}`)||{value:""}).value.trim(),(document.getElementById(`pyv_${i}`)||{value:""}).value.trim(),(document.getElementById(`pyl_${i}`)||{value:""}).value.trim()]).filter(p=>p[0]);}
+}
+function addProj(){collectCourse();editCourse.projs.push(["",""]);buildTabProjetos();}
+function removeProj(i){collectCourse();editCourse.projs.splice(i,1);buildTabProjetos();}
+function addPay(){collectCourse();editCourse.pays.push(["","","",""]);buildTabPagamentos();}
+function removePay(i){collectCourse();editCourse.pays.splice(i,1);buildTabPagamentos();}
+function saveCourse(){collectCourse();COURSES[activeId]=JSON.parse(JSON.stringify(editCourse));save();closeModal();renderCourse();toast("Alterações salvas!");}
+
+// ── MODAL CUPONS ──────────────────────────────────────────────────────────
+function openCuponsEdit(){
+  modalMode="cupons";
+  editCupons=JSON.parse(JSON.stringify(CUPONS));
+  document.getElementById("modalTitle").textContent="Editar cupons de desconto";
+  document.getElementById("modalTabs").style.display="none";
+  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("on"));
+  document.getElementById("tab-turma").classList.add("on");
+  buildCuponsForm();
+  document.getElementById("saveBtn").onclick=saveCupons;
+  document.getElementById("overlay").classList.add("open");
+}
+function buildCuponsForm(){
+  document.getElementById("tab-turma").innerHTML=`<div class="modal-section"><div class="modal-section-title">Cupons</div><div style="display:grid;grid-template-columns:130px 90px 1fr 28px;gap:8px;margin-bottom:6px"><div class="col-hdr">Código</div><div class="col-hdr">Desconto</div><div class="col-hdr">Observação</div><div></div></div><div id="cupRows">${editCupons.map((c,i)=>`<div class="cup-edit-row"><input class="field-input" id="cc_${i}" value="${c.code}"><input class="field-input" id="cd_${i}" value="${c.disc}"><input class="field-input" id="co_${i}" value="${c.obs||""}"><button class="btn-remove" onclick="removeCupon(${i})"><i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i></button></div>`).join("")}</div><button class="btn-add-row" onclick="addCupon()"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i> Adicionar cupom</button></div>`;
+}
+function collectCupons(){editCupons=editCupons.map((_,i)=>({code:va(`cc_${i}`),disc:va(`cd_${i}`),obs:va(`co_${i}`)})).filter(c=>c.code);}
+function addCupon(){collectCupons();editCupons.push({code:"",disc:"",obs:""});buildCuponsForm();}
+function removeCupon(i){collectCupons();editCupons.splice(i,1);buildCuponsForm();}
+function saveCupons(){collectCupons();CUPONS=JSON.parse(JSON.stringify(editCupons));save();closeModal();renderCupons();toast("Cupons atualizados!");}
+
+// ── MODAL INDICAÇÃO ───────────────────────────────────────────────────────
+function openIndEdit(){
+  modalMode="ind";
+  editInd=JSON.parse(JSON.stringify(IND));
+  document.getElementById("modalTitle").textContent="Editar links de indicação";
+  document.getElementById("modalTabs").style.display="none";
+  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("on"));
+  document.getElementById("tab-turma").classList.add("on");
+  buildIndForm();
+  document.getElementById("saveBtn").onclick=saveInd;
+  document.getElementById("overlay").classList.add("open");
+}
+function buildIndForm(){
+  document.getElementById("tab-turma").innerHTML=`<div class="modal-section"><div class="modal-section-title">Consultores e links</div><div style="display:grid;grid-template-columns:140px 150px 1fr 28px;gap:8px;margin-bottom:6px"><div class="col-hdr">Supervisor</div><div class="col-hdr">Consultor / SDR</div><div class="col-hdr">Link de indicação</div><div></div></div><div id="indRows">${editInd.map((item,i)=>`<div class="ind-edit-row"><input class="field-input" id="is_${i}" value="${item.sup}"><input class="field-input" id="in_${i}" value="${item.name}"><input class="field-input" id="il_${i}" value="${item.link}"><button class="btn-remove" onclick="removeInd(${i})"><i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i></button></div>`).join("")}</div><button class="btn-add-row" onclick="addInd()"><i class="ti ti-plus" style="font-size:12px" aria-hidden="true"></i> Adicionar pessoa</button></div>`;
+}
+function collectInd(){editInd=editInd.map((_,i)=>({sup:va(`is_${i}`),name:va(`in_${i}`),link:va(`il_${i}`)})).filter(x=>x.name);}
+function addInd(){collectInd();editInd.push({sup:"",name:"",link:""});buildIndForm();}
+function removeInd(i){collectInd();editInd.splice(i,1);buildIndForm();}
+function saveInd(){collectInd();IND=JSON.parse(JSON.stringify(editInd));save();closeModal();renderInd();toast("Links de indicação atualizados!");}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function v(id){const el=document.getElementById(id);return el?(el.value||el.textContent||"").trim():"";}
+function va(id){const el=document.getElementById(id);return el?el.value.trim():"";}
+function closeModal(){document.getElementById("overlay").classList.remove("open");}
+function toast(msg){const t=document.getElementById("toast");document.getElementById("toastMsg").textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+load();
+buildPills();
+renderCourse();
+
+// inject edit buttons for cupons and indicacao views into brand-right
+const br=document.querySelector(".brand-right");
+const bc=document.createElement("button");bc.className="btn";bc.id="cupons-edit-btn";bc.style.display="none";bc.innerHTML='<i class="ti ti-edit" style="font-size:14px" aria-hidden="true"></i> Editar cupons';bc.onclick=openCuponsEdit;br.appendChild(bc);
+const bi=document.createElement("button");bi.className="btn";bi.id="ind-edit-btn";bi.style.display="none";bi.innerHTML='<i class="ti ti-edit" style="font-size:14px" aria-hidden="true"></i> Editar indicações';bi.onclick=openIndEdit;br.appendChild(bi);
+</script>
+</body>
+</html>
